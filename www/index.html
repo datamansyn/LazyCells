@@ -36,7 +36,7 @@ input[type=number],input[type=text]{padding:9px;border-radius:8px;border:1px sol
 </style>
 </head>
 <body>
-<h1>Voltage Logger</h1>
+<h1>Voltage Logger <span style="font-size:12px;color:var(--mut)">app v2</span></h1>
 
 <div class="card">
   <button id="mic">Start listening</button>
@@ -150,7 +150,12 @@ input[type=number],input[type=text]{padding:9px;border-radius:8px;border:1px sol
   }
 
   var NativeSR=null;
-  try{if(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())NativeSR=Capacitor.registerPlugin("SpeechRecognition")}catch(e){}
+  var IN_APP=false;
+  try{
+    var C=window.Capacitor;
+    IN_APP=!!(C&&((C.isNativePlatform&&C.isNativePlatform())||C.isNative));
+    if(IN_APP){NativeSR=(C.Plugins&&C.Plugins.SpeechRecognition)||(C.registerPlugin?C.registerPlugin("SpeechRecognition"):null)}
+  }catch(e){}
   function setStatus(t){$("status").textContent=t}
 
   async function nativeLoop(){
@@ -211,7 +216,7 @@ input[type=number],input[type=text]{padding:9px;border-radius:8px;border:1px sol
     try{rec&&rec.stop()}catch(e){}
     try{wake&&wake.release();wake=null}catch(e){}
   }
-  $("mic").onclick=function(){if(listening){stop()}else if(NativeSR){startNative()}else{startWeb()}};
+  $("mic").onclick=function(){if(listening){stop()}else if(NativeSR){startNative()}else if(IN_APP){setStatus("Native speech plugin was not found in this build. Send this message to Claude.")}else{startWeb()}};
 
   $("copy").onclick=function(){
     var txt=readings.join("\n");
@@ -230,6 +235,7 @@ input[type=number],input[type=text]{padding:9px;border-radius:8px;border:1px sol
   ["dec","lo","hi","auto","beep"].forEach(function(k){$(k).onchange=function(){save();render()}});
 
   load();render();
+  if(NativeSR)setStatus("Android speech mode. Tap Start listening and say a number.");
 })();
 </script>
 </body>
