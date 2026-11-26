@@ -1,6 +1,6 @@
 {
   "appId": "com.cellvoltage.logger",
-  "appName": "Voltage Logger",
+  "appName": "LazyCells",
   "webDir": "www",
   "server": { "androidScheme": "https" }
 }
